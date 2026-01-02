@@ -14,6 +14,7 @@ public class Program
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<OrderService>();
         builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<MessageService>();
 
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>

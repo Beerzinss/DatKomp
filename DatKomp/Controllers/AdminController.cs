@@ -11,17 +11,26 @@ public class AdminController : Controller
     private readonly ProductService _productService;
     private readonly UserService _userService;
     private readonly OrderService _orderService;
+    private readonly MessageService _messageService;
 
-    public AdminController(ProductService productService, UserService userService, OrderService orderService)
+    public AdminController(ProductService productService, UserService userService, OrderService orderService, MessageService messageService)
     {
         _productService = productService;
         _userService = userService;
         _orderService = orderService;
+        _messageService = messageService;
     }
 
     public IActionResult Index()
     {
         return View();
+    }
+
+    // Messages
+    public async Task<IActionResult> Messages()
+    {
+        var messages = await _messageService.GetAllMessagesAsync();
+        return View(messages);
     }
 
     // Products

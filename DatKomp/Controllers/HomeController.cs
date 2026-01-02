@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using DatKomp.Models;
 using DatKomp.Services;
@@ -9,11 +10,13 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly ProductService _productService;
+    private readonly MessageService _messageService;
 
-    public HomeController(ILogger<HomeController> logger, ProductService productService)
+    public HomeController(ILogger<HomeController> logger, ProductService productService, MessageService messageService)
     {
         _logger = logger;
         _productService = productService;
+        _messageService = messageService;
     }
 
     public async Task<IActionResult> Index(string? category, List<string>? specFilters)
@@ -102,9 +105,45 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet]
     public IActionResult Contacts()
     {
-        return View();
+        ViewBag.MessageSent = TempData["MessageSent"] as bool? == true;
+        return View(new ContactMessageViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Contacts(ContactMessageViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var userId = 0;
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (idClaim != null && int.TryParse(idClaim.Value, out var parsed))
+            {
+                userId = parsed;
+            }
+        }
+
+        var message = new ContactMessage
+        {
+            UserId = userId,
+            Email = null,
+            Content = model.Text.Trim(),
+            CreatedAtUtc = DateTime.UtcNow,
+            IsRead = false
+        };
+
+        await _messageService.CreateMessageAsync(message);
+
+        TempData["MessageSent"] = true;
+        return RedirectToAction(nameof(Contacts));
     }
 
     public async Task<IActionResult> Details(int id)
