@@ -1,0 +1,73 @@
+@model IEnumerable<DatKomp.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Grozs";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Grozs</h1>
+
+@if (!Model.Any())
+{
+    <p>Grozs ir tukšs.</p>
+}
+else
+{
+    var total = Model.Sum(i => i.Price * i.Quantity);
+    <table class="table-auto w-full border-collapse mb-4">
+        <thead>
+            <tr class="border-b">
+                <th class="text-left py-2">Produkts</th>
+                <th class="text-right py-2">Daudzums</th>
+                <th class="text-right py-2">Cena</th>
+                <th class="text-right py-2">Kopējā summa</th>
+                <th class="text-right py-2"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="border-b">
+                <td class="py-2">
+                    <div class="flex items-center gap-3">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.Name" class="w-12 h-12 object-cover" />
+                        }
+                        <span>@item.Name</span>
+                    </div>
+                </td>
+                <td class="py-2 text-right">
+                    <div class="inline-flex items-center gap-2">
+                        <form asp-controller="Cart" asp-action="Decrement" method="post" class="inline">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="w-8 h-8 rounded border border-gray-300 hover:bg-gray-100">-</button>
+                        </form>
+                        <span class="min-w-[2rem] inline-block text-center">@item.Quantity</span>
+                        <form asp-controller="Cart" asp-action="Increment" method="post" class="inline">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="w-8 h-8 rounded border border-gray-300 hover:bg-gray-100">+</button>
+                        </form>
+                    </div>
+                </td>
+                <td class="py-2 text-right">@item.Price.ToString("0.00") €</td>
+                <td class="py-2 text-right">@(item.Price * item.Quantity) €</td>
+                <td class="py-2 text-right">
+                    <form asp-controller="Cart" asp-action="Remove" method="post" class="inline">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Noņemt</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <div class="text-right font-semibold">
+        Kopējā summa: @total.ToString("0.00") €
+    </div>
+    <div class="text-right pt-6">
+        <a asp-action="Checkout" class="inline-block mt-4 bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700 transition-colors">
+            Turpināt uz apmaksu
+        </a>
+    </div>
+}

@@ -1,0 +1,31 @@
+@model IEnumerable<DatKomp.Models.AppUser>
+
+@{
+    ViewData["Title"] = "Lietotāji";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Reģistrētie lietotāji</h1>
+
+<table class="table-auto w-full border-collapse">
+    <thead>
+        <tr class="border-b">
+            <th class="text-left py-2 px-2">ID</th>
+            <th class="text-left py-2 px-2">Vārds</th>
+            <th class="text-left py-2 px-2">Uzvārds</th>
+            <th class="text-left py-2 px-2">E-pasts</th>
+            <th class="text-left py-2 px-2">Admin</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr class="border-b">
+            <td class="py-2 px-2">@u.Id</td>
+            <td class="py-2 px-2">@u.FirstName</td>
+            <td class="py-2 px-2">@u.LastName</td>
+            <td class="py-2 px-2">@u.Email</td>
+            <td class="py-2 px-2">@(u.IsAdmin ? "Jā" : "Nē")</td>
+        </tr>
+    }
+    </tbody>
+</table>

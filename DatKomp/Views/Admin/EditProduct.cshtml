@@ -1,0 +1,86 @@
+@model DatKomp.Models.ProductEditViewModel
+
+@{
+    ViewData["Title"] = Model.Product.Id == 0 ? "Jauns produkts" : "Rediģēt produktu";
+}
+
+<h1 class="mb-4 text-2xl font-bold">@ViewData["Title"]</h1>
+
+<form asp-action="EditProduct" method="post" class="space-y-6">
+    <input type="hidden" asp-for="Product.Id" />
+
+    <div>
+        <label asp-for="Product.Name" class="block font-semibold mb-1"></label>
+        <input asp-for="Product.Name" class="w-full border rounded px-2 py-1" />
+        <span asp-validation-for="Product.Name" class="text-red-600 text-sm"></span>
+    </div>
+
+    <div>
+        <label asp-for="Product.Description" class="block font-semibold mb-1"></label>
+        <textarea asp-for="Product.Description" class="w-full border rounded px-2 py-1" rows="3"></textarea>
+        <span asp-validation-for="Product.Description" class="text-red-600 text-sm"></span>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label asp-for="Product.Price" class="block font-semibold mb-1"></label>
+            <input asp-for="Product.Price" class="w-full border rounded px-2 py-1" />
+            <span asp-validation-for="Product.Price" class="text-red-600 text-sm"></span>
+        </div>
+        <div>
+            <label asp-for="Product.StockQty" class="block font-semibold mb-1"></label>
+            <input asp-for="Product.StockQty" class="w-full border rounded px-2 py-1" />
+            <span asp-validation-for="Product.StockQty" class="text-red-600 text-sm"></span>
+        </div>
+        <div>
+            <label asp-for="Product.ImageUrl" class="block font-semibold mb-1"></label>
+            <input asp-for="Product.ImageUrl" class="w-full border rounded px-2 py-1" />
+            <span asp-validation-for="Product.ImageUrl" class="text-red-600 text-sm"></span>
+        </div>
+    </div>
+
+    <div>
+        <h2 class="font-semibold mb-2">Kategorijas</h2>
+        <div class="grid grid-cols-3 gap-2">
+            @foreach (var c in Model.AllCategories)
+            {
+                var isChecked = Model.SelectedCategoryIds.Contains(c.Id);
+                <label class="flex items-center text-sm">
+                    <input type="checkbox" name="SelectedCategoryIds" value="@c.Id" @(isChecked ? "checked" : null) class="mr-2" />
+                    <span>@c.Name</span>
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <h2 class="font-semibold mb-2">Specifikācijas</h2>
+        <div class="space-y-2">
+            @for (var i = 0; i < Model.Specs.Count; i++)
+            {
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="hidden" asp-for="Specs[i].Id" />
+                    <input type="hidden" asp-for="Specs[i].ProductId" />
+                    <div>
+                        <label class="block text-xs text-gray-600">Nosaukums</label>
+                        <input asp-for="Specs[i].SpecName" class="w-full border rounded px-2 py-1 text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600">Vērtība</label>
+                        <input asp-for="Specs[i].SpecValue" class="w-full border rounded px-2 py-1 text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600">Vienība</label>
+                        <input asp-for="Specs[i].Unit" class="w-full border rounded px-2 py-1 text-sm" />
+                    </div>
+                </div>
+            }
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Atstājiet tukšas rindas, kuras nevēlaties saglabāt.</p>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">Saglabāt</button>
+        <a asp-action="Products" class="px-4 py-1 rounded border border-gray-300">Atpakaļ</a>
+    </div>
+</form>

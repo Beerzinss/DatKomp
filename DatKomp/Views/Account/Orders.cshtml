@@ -1,0 +1,59 @@
+@model IEnumerable<DatKomp.Models.UserOrderSummary>
+
+@{
+    ViewData["Title"] = "Mani pasūtījumi";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Mani pasūtījumi</h1>
+
+@if (!Model.Any())
+{
+    <p>Jums vēl nav neviena pasūtījuma.</p>
+}
+else
+{
+    <table class="table-auto w-full border-collapse mb-4">
+        <thead>
+            <tr class="border-b">
+                <th class="text-left py-2 px-2">Pasūtījuma ID</th>
+                <th class="text-left py-2 px-2">Datums</th>
+                <th class="text-right py-2 px-2">Preču summa</th>
+                <th class="text-right py-2 px-2">Piegāde</th>
+                <th class="text-right py-2 px-2">Kopā</th>
+                <th class="text-left py-2 px-2">Statuss</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var o in Model)
+        {
+            <tr class="border-b align-top">
+                <td class="py-2 px-2">@o.Id</td>
+                <td class="py-2 px-2">@o.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td class="py-2 px-2 text-right">@o.ItemsTotal.ToString("0.00") €</td>
+                <td class="py-2 px-2 text-right">@o.DeliveryPrice.ToString("0.00") €</td>
+                <td class="py-2 px-2 text-right">@o.GrandTotal.ToString("0.00") €</td>
+                <td class="py-2 px-2">@o.StatusName</td>
+            </tr>
+            @if (o.Items != null && o.Items.Any())
+            {
+                <tr class="border-b bg-gray-50">
+                    <td class="py-2 px-2" colspan="6">
+                        <div class="text-sm font-semibold mb-1">Pasūtītās preces:</div>
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach (var item in o.Items)
+                            {
+                                <li>
+                                    <span class="font-medium">@item.ProductName</span>
+                                    <span class="ml-2">x @item.Quantity</span>
+                                    <span class="ml-2 text-gray-600">(@item.UnitPrice.ToString("0.00") € / gab.)</span>
+                                    <span class="ml-2 font-semibold">Kopā: @item.LineTotal.ToString("0.00") €</span>
+                                </li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+}

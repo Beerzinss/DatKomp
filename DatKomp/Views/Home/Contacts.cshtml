@@ -1,4 +1,27 @@
-<div class="text-center">
-    <h1 class="display-4">Hello</h1>
-    <p>This is contact page.</p>
+@model DatKomp.Models.ContactMessageViewModel
+
+<div class="">
+    <h1 class="text-center text-2xl font-bold">Kontakti</h1>
+    <p class="pt-5">Esam ļoti nesen atvēries uzņēmums, kas strādā ar komponentu tirdzniecību un servisu.</p>
+    <p class="font-bold pt-5">Kontaktinformācija saziņai:</p>
+    <p class="pt-2"><strong>Telefona numurs:</strong> +371 22053397</p>
+    <p class="pt-2 mb-6"><strong>E-pasts:</strong> info@datkomp.lv</p>
+
+    @if (ViewBag.MessageSent == true)
+    {
+        <div class="mb-4 p-3 rounded bg-green-100 text-green-800 text-sm">Paldies! Jūsu ziņa ir nosūtīta.</div>
+    }
+
+    <h2 class="text-xl font-semibold mb-2">Sūtīt ziņu</h2>
+    <form asp-action="Contacts" method="post" class="space-y-3">
+        <div>
+            <textarea asp-for="Text" rows="5" class="w-full border rounded px-3 py-2" placeholder="Jūsu ziņa..."></textarea>
+            <span asp-validation-for="Text" class="text-red-600 text-sm"></span>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">Sūtīt</button>
+    </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

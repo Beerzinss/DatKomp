@@ -1,0 +1,39 @@
+@model IEnumerable<DatKomp.Models.DeliveryType>
+
+@{
+    ViewData["Title"] = "Piegādes veidi";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Piegādes veidi</h1>
+
+<p class="mb-3">
+    <a class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700" asp-action="EditDeliveryType">Pievienot piegādes veidu</a>
+</p>
+
+<table class="table-auto w-full border-collapse">
+    <thead>
+        <tr class="border-b">
+            <th class="text-left py-2 px-2">ID</th>
+            <th class="text-left py-2 px-2">Nosaukums</th>
+            <th class="text-left py-2 px-2">Apraksts</th>
+            <th class="text-right py-2 px-2">Cena</th>
+            <th class="text-left py-2 px-2">Aktīvs</th>
+            <th class="text-left py-2 px-2">Darbības</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var t in Model)
+    {
+        <tr class="border-b">
+            <td class="py-2 px-2">@t.Id</td>
+            <td class="py-2 px-2">@t.Name</td>
+            <td class="py-2 px-2">@t.Description</td>
+            <td class="py-2 px-2 text-right">@t.Price.ToString("0.00") €</td>
+            <td class="py-2 px-2">@(t.IsActive ? "Jā" : "Nē")</td>
+            <td class="py-2 px-2">
+                <a class="text-blue-600 hover:underline" asp-action="EditDeliveryType" asp-route-id="@t.Id">Rediģēt</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
