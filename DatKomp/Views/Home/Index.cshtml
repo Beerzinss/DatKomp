@@ -1,0 +1,30 @@
+﻿@model IEnumerable<DatKomp.Models.Product>
+
+@{
+    ViewData["Title"] = "Produkti";
+}
+
+<h1 class="mb-4">Produkti</h1>
+
+<div class="grid grid-cols-4 gap-5">
+@foreach (var item in Model)
+{
+    <div class="col">
+        <a asp-action="Details" asp-route-id="@item.Id" class="block no-underline text-inherit">
+            <div class="card h-100 cursor-pointer hover:shadow-lg transition-shadow">
+                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                {
+                    <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" />
+                }
+                <div class="card-body">
+                    <h5 class="font-bold text-xl">@item.Name</h5>
+                    @if (!string.IsNullOrEmpty(item.Description))
+                    {
+                        <p class="card-text">@item.Description</p>
+                    }
+                </div>
+            </div>
+        </a>
+    </div>
+}
+</div>
