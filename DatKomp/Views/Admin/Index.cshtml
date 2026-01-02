@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Admin panelis";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Admin panelis</h1>
+
+<ul class="list-disc pl-5 space-y-1">
+    <li><a class="text-blue-600 hover:underline" asp-controller="Admin" asp-action="Products">Produkti</a></li>
+    <li><a class="text-blue-600 hover:underline" asp-controller="Admin" asp-action="Users">Lietotāji</a></li>
+    <li><a class="text-blue-600 hover:underline" asp-controller="Admin" asp-action="Orders">Pasūtījumi</a></li>
+    <li><a class="text-blue-600 hover:underline" asp-controller="Admin" asp-action="DeliveryTypes">Piegādes veidi</a></li>
+</ul>

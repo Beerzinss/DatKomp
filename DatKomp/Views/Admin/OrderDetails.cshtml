@@ -1,0 +1,60 @@
+@model DatKomp.Models.AdminOrderDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Pasūtījums #{Model.Order.Id}";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Pasūtījums #@Model.Order.Id</h1>
+
+<div class="grid grid-cols-2 gap-6 mb-6">
+    <div>
+        <h2 class="font-semibold mb-2">Klienta dati</h2>
+        <p><strong>Vārds, Uzvārds:</strong> @Model.Order.FirstName @Model.Order.LastName</p>
+        <p><strong>Adrese:</strong> @Model.Order.AddressLine</p>
+        <p><strong>Telefons:</strong> @Model.Order.Phone</p>
+        <p><strong>E-pasts:</strong> @Model.Order.Email</p>
+    </div>
+    <div>
+        <h2 class="font-semibold mb-2">Pasūtījuma informācija</h2>
+        <p><strong>Datums:</strong> @Model.Order.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
+        <p><strong>Piegādes veids:</strong> @Model.Order.DeliveryTypeName</p>
+        <p><strong>Preču summa:</strong> @Model.Order.ItemsTotal.ToString("0.00") €</p>
+        <p><strong>Piegāde:</strong> @Model.Order.DeliveryPrice.ToString("0.00") €</p>
+        <p><strong>Kopā:</strong> @Model.Order.GrandTotal.ToString("0.00") €</p>
+    </div>
+</div>
+
+<h2 class="font-semibold mb-2">Preces</h2>
+<table class="table-auto w-full border-collapse mb-4">
+    <thead>
+        <tr class="border-b">
+            <th class="text-left py-2 px-2">Produkts</th>
+            <th class="text-right py-2 px-2">Daudzums</th>
+            <th class="text-right py-2 px-2">Cena / gab.</th>
+            <th class="text-right py-2 px-2">Kopā</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Order.Items)
+    {
+        <tr class="border-b">
+            <td class="py-2 px-2">@item.ProductName</td>
+            <td class="py-2 px-2 text-right">@item.Quantity</td>
+            <td class="py-2 px-2 text-right">@item.UnitPrice.ToString("0.00") €</td>
+            <td class="py-2 px-2 text-right">@item.LineTotal.ToString("0.00") €</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h2 class="font-semibold mb-2">Pasūtījuma statuss</h2>
+<form asp-action="UpdateOrderStatus" method="post" class="flex items-center gap-3 mb-4">
+    <input type="hidden" asp-for="Order.Id" />
+    <label class="font-semibold" for="SelectedStatusId">Statuss:</label>
+    <select asp-for="SelectedStatusId" asp-items="@(new SelectList(Model.Statuses, "Id", "Name", Model.SelectedStatusId))" class="border rounded px-2 py-1"></select>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">Saglabāt</button>
+</form>
+
+<p>
+    <a asp-action="Orders" class="text-blue-600 hover:underline">Atpakaļ uz pasūtījumu sarakstu</a>
+</p>

@@ -1,4 +1,5 @@
 using DatKomp.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace DatKomp;
 
@@ -11,6 +12,21 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
         builder.Services.AddScoped<ProductService>();
+        builder.Services.AddScoped<OrderService>();
+        builder.Services.AddScoped<UserService>();
+
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+            });
+
+        builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddSession(options =>
+        {
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
 
         var app = builder.Build();
 
@@ -25,7 +41,9 @@ public class Program
         app.UseHttpsRedirection();
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
+        app.UseSession();
 
         app.MapStaticAssets();
         app.MapControllerRoute(

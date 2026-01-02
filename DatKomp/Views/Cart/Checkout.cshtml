@@ -1,0 +1,103 @@
+@model DatKomp.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Apmaksa";
+}
+
+<h1 class="mb-6 text-2xl font-bold">Pasūtījuma informācija</h1>
+
+<div class="grid grid-cols-3 gap-8">
+    <div class="col-span-2">
+        <form asp-action="Checkout" method="post" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="FirstName" class="block text-sm font-medium mb-1"></label>
+                    <input asp-for="FirstName" class="w-full border rounded px-3 py-2" />
+                    <span asp-validation-for="FirstName" class="text-red-600 text-sm"></span>
+                </div>
+                <div>
+                    <label asp-for="LastName" class="block text-sm font-medium mb-1"></label>
+                    <input asp-for="LastName" class="w-full border rounded px-3 py-2" />
+                    <span asp-validation-for="LastName" class="text-red-600 text-sm"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="Phone" class="block text-sm font-medium mb-1"></label>
+                    <input asp-for="Phone" class="w-full border rounded px-3 py-2" />
+                    <span asp-validation-for="Phone" class="text-red-600 text-sm"></span>
+                </div>
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium mb-1"></label>
+                    <input asp-for="Email" class="w-full border rounded px-3 py-2" />
+                    <span asp-validation-for="Email" class="text-red-600 text-sm"></span>
+                </div>
+            </div>
+
+            <div>
+                <label asp-for="AddressLine" class="block text-sm font-medium mb-1"></label>
+                <input asp-for="AddressLine" class="w-full border rounded px-3 py-2" />
+                <span asp-validation-for="AddressLine" class="text-red-600 text-sm"></span>
+            </div>
+
+            <div>
+                <span class="block text-sm font-medium mb-1">@Html.DisplayNameFor(m => m.DeliveryTypeId)</span>
+                <div class="space-y-2">
+                    @foreach (var dt in Model.DeliveryTypes)
+                    {
+                        <label class="flex items-center justify-between border rounded px-3 py-2 cursor-pointer">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" asp-for="DeliveryTypeId" value="@dt.Id" class="mr-2" />
+                                <span class="font-medium">@dt.Name</span>
+                            </div>
+                            <div class="text-sm text-gray-700">
+                                @dt.Price.ToString("0.00") €
+                            </div>
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="DeliveryTypeId" class="text-red-600 text-sm"></span>
+            </div>
+
+            <button type="submit" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700 transition-colors">
+                Apstiprināt pasūtījumu
+            </button>
+        </form>
+    </div>
+
+    <div>
+        <h2 class="text-xl font-semibold mb-3">Jūsu grozs</h2>
+        @if (!Model.CartItems.Any())
+        {
+            <p>Grozs ir tukšs.</p>
+        }
+        else
+        {
+            <ul class="divide-y">
+                @foreach (var item in Model.CartItems)
+                {
+                    <li class="py-2 flex justify-between">
+                        <div>
+                            <div class="font-medium">@item.Name</div>
+                            <div class="text-sm text-gray-600">x @item.Quantity</div>
+                        </div>
+                        <div class="text-right">
+                            <div>@item.Price.ToString("0.00") €</div>
+                            <div class="text-sm text-gray-600">@(item.Price * item.Quantity) €</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            <div class="mt-4 border-t pt-2 text-right text-sm text-gray-700">
+                <div>Preču summa: @Model.ItemsTotal.ToString("0.00") €</div>
+                <div>Piegāde: (tiks aprēķināta pēc izvēles)</div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

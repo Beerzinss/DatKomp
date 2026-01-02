@@ -1,0 +1,28 @@
+@model DatKomp.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Pieteikšanās";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Pieteikšanās</h1>
+
+<form asp-action="Login" method="post" class="space-y-4 max-w-md">
+    <div>
+        <label asp-for="Email" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="Email" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="Email" class="text-red-600 text-sm"></span>
+    </div>
+    <div>
+        <label asp-for="Password" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="Password" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="Password" class="text-red-600 text-sm"></span>
+    </div>
+
+    <button type="submit" class="mt-2 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+        Pieteikties
+    </button>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
