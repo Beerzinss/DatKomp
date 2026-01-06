@@ -357,10 +357,13 @@ public class ProductService
 
         foreach (var spec in validSpecs)
         {
+            var key = spec.SpecName!;
+            var value = spec.SpecValue!;
+
             await using var insertCmd = new NpgsqlCommand(insertSql, connection, tx);
             insertCmd.Parameters.AddWithValue("@product_id", productId);
-            insertCmd.Parameters.AddWithValue("@key", spec.SpecName);
-            insertCmd.Parameters.AddWithValue("@value", spec.SpecValue);
+            insertCmd.Parameters.AddWithValue("@key", key);
+            insertCmd.Parameters.AddWithValue("@value", value);
             insertCmd.Parameters.AddWithValue("@unit", (object?)spec.Unit ?? DBNull.Value);
             await insertCmd.ExecuteNonQueryAsync();
         }

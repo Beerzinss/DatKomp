@@ -9,6 +9,8 @@
 <form asp-action="EditProduct" method="post" class="space-y-6">
     <input type="hidden" asp-for="Product.Id" />
 
+    <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
+
     <div>
         <label asp-for="Product.Name" class="block font-semibold mb-1"></label>
         <input asp-for="Product.Name" class="w-full border rounded px-2 py-1" />
@@ -24,12 +26,12 @@
     <div class="grid grid-cols-3 gap-4">
         <div>
             <label asp-for="Product.Price" class="block font-semibold mb-1"></label>
-            <input asp-for="Product.Price" class="w-full border rounded px-2 py-1" />
+            <input asp-for="Product.Price" type="number" step="0.01" min="0" class="w-full border rounded px-2 py-1" />
             <span asp-validation-for="Product.Price" class="text-red-600 text-sm"></span>
         </div>
         <div>
             <label asp-for="Product.StockQty" class="block font-semibold mb-1"></label>
-            <input asp-for="Product.StockQty" class="w-full border rounded px-2 py-1" />
+            <input asp-for="Product.StockQty" type="number" step="1" min="0" class="w-full border rounded px-2 py-1" />
             <span asp-validation-for="Product.StockQty" class="text-red-600 text-sm"></span>
         </div>
         <div>
@@ -55,7 +57,7 @@
 
     <div>
         <h2 class="font-semibold mb-2">Specifikācijas</h2>
-        <div class="space-y-2">
+        <div id="specRows" class="space-y-2" data-next-index="@Model.Specs.Count">
             @for (var i = 0; i < Model.Specs.Count; i++)
             {
                 <div class="grid grid-cols-3 gap-2">
@@ -63,15 +65,15 @@
                     <input type="hidden" asp-for="Specs[i].ProductId" />
                     <div>
                         <label class="block text-xs text-gray-600">Nosaukums</label>
-                        <input asp-for="Specs[i].SpecName" class="w-full border rounded px-2 py-1 text-sm" />
+                        <input asp-for="Specs[i].SpecName" class="w-full border rounded px-2 py-1 text-sm spec-name" />
                     </div>
                     <div>
                         <label class="block text-xs text-gray-600">Vērtība</label>
-                        <input asp-for="Specs[i].SpecValue" class="w-full border rounded px-2 py-1 text-sm" />
+                        <input asp-for="Specs[i].SpecValue" class="w-full border rounded px-2 py-1 text-sm spec-value" />
                     </div>
                     <div>
                         <label class="block text-xs text-gray-600">Vienība</label>
-                        <input asp-for="Specs[i].Unit" class="w-full border rounded px-2 py-1 text-sm" />
+                        <input asp-for="Specs[i].Unit" class="w-full border rounded px-2 py-1 text-sm spec-unit" />
                     </div>
                 </div>
             }
@@ -84,3 +86,72 @@
         <a asp-action="Products" class="px-4 py-1 rounded border border-gray-300">Atpakaļ</a>
     </div>
 </form>
+
+@section Scripts {
+    <script>
+        (function () {
+            const specRows = document.getElementById('specRows');
+            if (!specRows) return;
+
+            const getNextIndex = () => Number(specRows.getAttribute('data-next-index') || '0');
+            const setNextIndex = (value) => specRows.setAttribute('data-next-index', String(value));
+
+            const wireRow = (row) => {
+                const inputs = row.querySelectorAll('input.spec-name, input.spec-value, input.spec-unit');
+                inputs.forEach(i => i.addEventListener('input', ensureExtraRow));
+            };
+
+            const isRowFilled = (row) => {
+                const name = row.querySelector('input.spec-name');
+                const value = row.querySelector('input.spec-value');
+                const unit = row.querySelector('input.spec-unit');
+                return Boolean(
+                    (name && name.value.trim().length > 0) ||
+                    (value && value.value.trim().length > 0) ||
+                    (unit && unit.value.trim().length > 0)
+                );
+            };
+
+            const addRow = () => {
+                const i = getNextIndex();
+                const productId = @Model.Product.Id;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'grid grid-cols-3 gap-2';
+                wrapper.innerHTML = `
+                    <input type="hidden" name="Specs[${i}].Id" value="0" />
+                    <input type="hidden" name="Specs[${i}].ProductId" value="${productId}" />
+                    <div>
+                        <label class="block text-xs text-gray-600">Nosaukums</label>
+                        <input name="Specs[${i}].SpecName" class="w-full border rounded px-2 py-1 text-sm spec-name" />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600">Vērtība</label>
+                        <input name="Specs[${i}].SpecValue" class="w-full border rounded px-2 py-1 text-sm spec-value" />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600">Vienība</label>
+                        <input name="Specs[${i}].Unit" class="w-full border rounded px-2 py-1 text-sm spec-unit" />
+                    </div>
+                `;
+
+                specRows.appendChild(wrapper);
+                wireRow(wrapper);
+                setNextIndex(i + 1);
+            };
+
+            const ensureExtraRow = () => {
+                const rows = Array.from(specRows.children);
+                const lastRow = rows[rows.length - 1];
+                if (!lastRow) return;
+                if (isRowFilled(lastRow)) {
+                    addRow();
+                }
+            };
+
+            // Wire up existing rows and ensure there's at least one empty row.
+            Array.from(specRows.children).forEach(wireRow);
+            ensureExtraRow();
+        })();
+    </script>
+}

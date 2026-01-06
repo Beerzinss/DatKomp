@@ -22,46 +22,102 @@
 }
     <header>
         <nav class="w-full bg-blue-900">
-            <div class="container mx-auto flex justify-between items-center px-5 h-16">
-                <a class="text-xl text-white" asp-area="" asp-controller="Home" asp-action="Index">DatKomp</a>
-                <div class="flex gap-6 items-center">
-                    <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Index">Sākums</a>
-                    <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Service">Serviss</a>
-                    <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="About">Par mums</a>
-                    <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Contacts">Kontakti</a>
-                    <a class="text-white hover:underline relative" asp-area="" asp-controller="Cart" asp-action="Index">
-                        Grozs
-                        @if (cartCount > 0)
-                        {
-                            <span class="ml-1 inline-flex items-center justify-center rounded-full bg-red-500 text-xs text-white px-1.5 py-0.5">@cartCount</span>
-                        }
-                    </a>
+            <div class="container mx-auto px-5 py-3">
+                <div class="flex items-center justify-between">
+                    <a class="text-xl text-white" asp-area="" asp-controller="Home" asp-action="Index">DatKomp</a>
 
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        @if (User.IsInRole("Admin"))
+                    <button
+                        id="mobileMenuButton"
+                        type="button"
+                        class="md:hidden text-white border border-white/30 rounded px-3 py-1"
+                        aria-expanded="false"
+                        aria-controls="mobileMenu">
+                        Menu
+                    </button>
+
+                    <div class="hidden md:flex items-center gap-5 flex-wrap md:w-2/3 lg:w-auto justify-center">
+                        
+                            <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Index">Sākums</a>
+                            
+                            <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Contacts">Kontakti</a>
+                      
+
+                        
+                            <a class="text-white hover:underline relative" asp-area="" asp-controller="Cart" asp-action="Index">
+                                Grozs
+                                @if (cartCount > 0)
+                                {
+                                    <span class="ml-1 inline-flex items-center justify-center rounded-full bg-red-500 text-xs text-white px-1.5 py-0.5">@cartCount</span>
+                                }
+                            </a>
+
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a class="text-white hover:underline" asp-controller="Admin" asp-action="Index">Admin panelis</a>
+                                }
+
+                                <a class="text-white hover:underline" asp-controller="Account" asp-action="Orders">@User.Identity.Name</a>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                                    <button type="submit" class="text-white hover:underline">Izrakstīties</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a class="text-white hover:underline hover:bg-blue-500/50 py-2 px-4 bg-blue-500 rounded-xl" asp-controller="Account" asp-action="Login">Pieteikties</a>
+                                <a class="text-white hover:underline hover:bg-blue-500/50 py-2 px-4 bg-blue-500 rounded-xl" asp-controller="Account" asp-action="Register">Reģistrēties</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mobileMenu" class="hidden md:hidden mt-3 border-t border-white/20 pt-3">
+                    <div class="flex flex-col gap-3">
+                        <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Index">Sākums</a>
+                        <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Service">Serviss</a>
+                        <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="About">Par mums</a>
+                        <a class="text-white hover:underline" asp-area="" asp-controller="Home" asp-action="Contacts">Kontakti</a>
+
+                        <a class="text-white hover:underline" asp-area="" asp-controller="Cart" asp-action="Index">Grozs (@cartCount)</a>
+
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <a class="text-white hover:underline" asp-controller="Admin" asp-action="Index">Admin panelis</a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="text-white hover:underline" asp-controller="Admin" asp-action="Index">Admin panelis</a>
+                            }
+                            <a class="text-white hover:underline" asp-controller="Account" asp-action="Orders">@User.Identity.Name</a>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                                <button type="submit" class="text-white hover:underline text-left">Izrakstīties</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="text-white hover:underline" asp-controller="Account" asp-action="Login">Pieteikties</a>
+                            <a class="text-white hover:underline" asp-controller="Account" asp-action="Register">Reģistrēties</a>
                         }
 
-                        <a class="text-white hover:underline" asp-controller="Account" asp-action="Orders">
-                            @User.Identity.Name
-                        </a>
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
-                            <button type="submit" class="text-white hover:underline">Izrakstīties</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <a class="text-white hover:underline hover:bg-blue-500/50 py-2 px-4 bg-blue-500 rounded-xl" asp-controller="Account" asp-action="Login">Pieteikties</a>
-                        <a class="text-white hover:underline hover:bg-blue-500/50 py-2 px-4 bg-blue-500 rounded-xl" asp-controller="Account" asp-action="Register">Reģistrēties</a>
-                    }
+                        <div class="border-t border-white/20 pt-3 mt-2">
+                            <div class="text-white/80 text-sm mb-2">Kategorijas</div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="CPU">CPU</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="GPU">GPU</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="PSU">PSU</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="Motherboard">MBU</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="RAM">RAM</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="Storage">Atmiņa</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="Case">Korpuss</a>
+                                <a class="text-white hover:underline" asp-controller="Home" asp-action="Index" asp-route-category="Cooler">Dzese</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="w-full bg-gray-500/20">
-        <div class="container mx-auto flex justify-evenly items-center ">
+    <div class="w-full bg-gray-500/20 hidden md:block">
+        <div class="container mx-auto flex flex-wrap justify-evenly items-center">
             <a asp-controller="Home" asp-action="Index" asp-route-category="CPU" class="cursor-pointer py-3 px-5 flex flex-col items-center gap-2 transform transition-transform duration-200 ease-out hover:scale-105">
                 <svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu-icon lucide-cpu"><path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/><path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/><path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>
@@ -92,7 +148,7 @@
                 </svg>
                 <span class="!text-black text-ceneter font-semibold">RAM</span>
             </a>
-            <a asp-controller="Home" asp-action="Index" asp-route-category="Memory" class="cursor-pointer py-3 px-5 flex flex-col items-center gap-2 transform transition-transform duration-200 ease-out hover:scale-105">
+            <a asp-controller="Home" asp-action="Index" asp-route-category="Storage" class="cursor-pointer py-3 px-5 flex flex-col items-center gap-2 transform transition-transform duration-200 ease-out hover:scale-105">
                 <svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hard-drive-icon lucide-hard-drive"><line x1="22" x2="2" y1="12" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" x2="6.01" y1="16" y2="16"/><line x1="10" x2="10.01" y1="16" y2="16"/></svg>
                 </svg>
@@ -104,7 +160,7 @@
                 </svg>
                 <span class="!text-black text-ceneter font-semibold">Korpuss</span>
             </a>
-            <a asp-controller="Home" asp-action="Index" asp-route-category="Coolers" class="cursor-pointer py-3 px-5 flex flex-col items-center gap-2 transform transition-transform duration-200 ease-out hover:scale-105">
+            <a asp-controller="Home" asp-action="Index" asp-route-category="Cooler" class="cursor-pointer py-3 px-5 flex flex-col items-center gap-2 transform transition-transform duration-200 ease-out hover:scale-105">
                 <svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fan-icon lucide-fan"><path d="M10.827 16.379a6.082 6.082 0 0 1-8.618-7.002l5.412 1.45a6.082 6.082 0 0 1 7.002-8.618l-1.45 5.412a6.082 6.082 0 0 1 8.618 7.002l-5.412-1.45a6.082 6.082 0 0 1-7.002 8.618l1.45-5.412Z"/><path d="M12 12v.01"/></svg>
                 </svg>

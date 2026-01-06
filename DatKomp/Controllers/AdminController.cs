@@ -8,13 +8,20 @@ namespace DatKomp.Controllers;
 [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
+    private readonly ILogger<AdminController> _logger;
     private readonly ProductService _productService;
     private readonly UserService _userService;
     private readonly OrderService _orderService;
     private readonly MessageService _messageService;
 
-    public AdminController(ProductService productService, UserService userService, OrderService orderService, MessageService messageService)
+    public AdminController(
+        ILogger<AdminController> logger,
+        ProductService productService,
+        UserService userService,
+        OrderService orderService,
+        MessageService messageService)
     {
+        _logger = logger;
         _productService = productService;
         _userService = userService;
         _orderService = orderService;
@@ -92,28 +99,75 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditProduct(ProductEditViewModel model)
     {
+        _logger.LogInformation(
+            "EditProduct POST: ProductId={ProductId}, Name={Name}, Price={Price}, StockQty={StockQty}",
+            model.Product?.Id,
+            model.Product?.Name,
+            model.Product?.Price,
+            model.Product?.StockQty);
+
         if (!ModelState.IsValid)
         {
+            var errorMessages = ModelState
+                .SelectMany(kvp => kvp.Value?.Errors.Select(e => $"{kvp.Key}: {e.ErrorMessage}") ?? Enumerable.Empty<string>())
+                .ToArray();
+            _logger.LogWarning("EditProduct POST ModelState invalid: {Errors}", string.Join(" | ", errorMessages));
+
+            // The POST doesn't send AllCategories (and may send fewer spec rows), so rebuild the view model.
+            model.AllCategories = await _productService.GetAllCategoriesAsync();
+            model.SelectedCategoryIds ??= new List<int>();
+            model.Specs ??= new List<ProductSpec>();
+            while (model.Specs.Count < 5)
+            {
+                model.Specs.Add(new ProductSpec());
+            }
             return View(model);
         }
 
-        var product = model.Product;
-        int productId;
-
-        if (product.Id == 0)
+        try
         {
-            productId = await _productService.CreateProductAsync(product);
+            var product = model.Product;
+            if (product == null)
+            {
+                throw new InvalidOperationException("Product payload is missing.");
+            }
+
+            int productId;
+
+            if (product.Id == 0)
+            {
+                productId = await _productService.CreateProductAsync(product);
+            }
+            else
+            {
+                await _productService.UpdateProductAsync(product);
+                productId = product.Id;
+            }
+
+            await _productService.ReplaceProductCategoriesAsync(productId, model.SelectedCategoryIds ?? new List<int>());
+            await _productService.ReplaceProductSpecsAsync(productId, model.Specs ?? new List<ProductSpec>());
+
+            TempData["AdminFlash"] = product.Id == 0
+                ? $"Produkts pievienots (ID: {productId})."
+                : "Produkts saglabāts.";
+
+            return RedirectToAction(nameof(Products));
         }
-        else
+        catch (Exception ex)
         {
-            await _productService.UpdateProductAsync(product);
-            productId = product.Id;
+            _logger.LogError(ex, "Failed to save product (Id={ProductId})", model.Product?.Id);
+            ModelState.AddModelError(string.Empty, "Neizdevās saglabāt produktu. Pārbaudiet ievadītos datus un mēģiniet vēlreiz.");
+
+            model.AllCategories = await _productService.GetAllCategoriesAsync();
+            model.SelectedCategoryIds ??= new List<int>();
+            model.Specs ??= new List<ProductSpec>();
+            while (model.Specs.Count < 5)
+            {
+                model.Specs.Add(new ProductSpec());
+            }
+
+            return View(model);
         }
-
-        await _productService.ReplaceProductCategoriesAsync(productId, model.SelectedCategoryIds ?? new List<int>());
-        await _productService.ReplaceProductSpecsAsync(productId, model.Specs ?? new List<ProductSpec>());
-
-        return RedirectToAction(nameof(Products));
     }
 
     [HttpPost]

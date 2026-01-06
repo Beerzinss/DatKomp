@@ -6,39 +6,58 @@
 
 <h1 class="mb-4">Produkti</h1>
 
-@if (!Model.Products.Any())
+@if (string.IsNullOrEmpty(Model.CurrentCategory))
 {
-    <p class="text-gray-600">Nothing found.</p>
-}
-else if (string.IsNullOrEmpty(Model.CurrentCategory))
-{
-    <div class="grid grid-cols-4 gap-5">
-        @foreach (var item in Model.Products)
-        {
-            <div class="col">
-                <a asp-action="Details" asp-route-id="@item.Id" class="block no-underline text-inherit transform transition-transform duration-200 ease-out hover:scale-105">
-                    <div class="card h-100 cursor-pointer hover:shadow-lg transition-shadow">
-                        @if (!string.IsNullOrEmpty(item.ImageUrl))
-                        {
-                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" />
-                        }
-                        <div class="card-body">
-                            <h5 class="font-bold text-xl">@item.Name</h5>
-                            @if (!string.IsNullOrEmpty(item.Description))
-                            {
-                                <p class="card-text">@item.Description</p>
-                            }
+    @if (!Model.Products.Any())
+    {
+        <p class="text-gray-600">Nothing found.</p>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            @foreach (var item in Model.Products)
+            {
+                <div class="">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="block no-underline text-inherit transform transition-transform duration-200 ease-out hover:scale-105 h-full">
+                        <div class="card h-full cursor-pointer hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
+                            <div class="w-full h-52 flex items-center justify-center overflow-hidden bg-white">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="w-full h-full object-contain" alt="@item.Name" />
+                                }
+                            </div>
+                            <div class="card-body flex-1 flex flex-col">
+                                <h5 class="font-bold text-xl h-14 overflow-hidden">@item.Name</h5>
+                                <p class="card-text text-gray-600 text-sm h-16 overflow-hidden">
+                                    @(string.IsNullOrEmpty(item.Description) ? "" : item.Description)
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </a>
-            </div>
-        }
-    </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="mt-6 flex items-center justify-center gap-4">
+            @if (Model.Page > 1)
+            {
+                <a class="font-bold text-xl" href="@Url.Action("Index", new { page = Model.Page - 1 })"> &lt; </a>
+            }
+            <span class="text-gray-600 text-sm">Page @Model.Page of @Model.TotalPages</span>
+            @if (Model.Page < Model.TotalPages)
+            {
+                <a class="font-bold text-xl" href="@Url.Action("Index", new { page = Model.Page + 1 })"> &gt; </a>
+            }
+        </div>
+    }
 }
 else
 {
-    <div class="flex gap-6">
-        <aside class="w-1/5 bg-gray-50 p-4 rounded border border-gray-200">
+    <div class="flex flex-col lg:flex-row gap-6">
+        <aside class="w-full lg:w-1/5 bg-gray-50 p-4 rounded border border-gray-200">
             <h2 class="font-bold mb-3">Filtrs pēc specifikācijām</h2>
 
             <form method="get" asp-action="Index">
@@ -81,28 +100,51 @@ else
         </aside>
 
         <div class="flex-1">
-            <div class="grid grid-cols-3 gap-5">
-                @foreach (var item in Model.Products)
-                {
-                    <div class="col">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="block no-underline text-inherit transform transition-transform duration-200 ease-out hover:scale-105">
-                            <div class="card h-100 cursor-pointer hover:shadow-lg transition-shadow">
-                                @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                {
-                                    <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" />
-                                }
-                                <div class="card-body">
-                                    <h5 class="font-bold text-xl">@item.Name</h5>
-                                    @if (!string.IsNullOrEmpty(item.Description))
-                                    {
-                                        <p class="card-text">@item.Description</p>
-                                    }
+            @if (!Model.Products.Any())
+            {
+                <p class="text-gray-600">Nothing found.</p>
+            }
+            else
+            {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    @foreach (var item in Model.Products)
+                    {
+                        <div class="col">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="block no-underline text-inherit transform transition-transform duration-200 ease-out hover:scale-105">
+                                <div class="card h-full cursor-pointer hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
+                                    <div class="w-full h-52 flex items-center justify-center overflow-hidden bg-white">
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" class="w-full h-full object-contain" alt="@item.Name" />
+                                        }
+                                    </div>
+                                    <div class="card-body flex-1 flex flex-col">
+                                        <h5 class="font-bold text-xl h-14 overflow-hidden">@item.Name</h5>
+                                        <p class="card-text text-gray-600 text-sm h-16 overflow-hidden">
+                                            @(string.IsNullOrEmpty(item.Description) ? "" : item.Description)
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
-                    </div>
-                }
-            </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.TotalPages > 1)
+            {
+                <div class="mt-6 flex items-center justify-center gap-4">
+                    @if (Model.Page > 1)
+                    {
+                        <a class="text-blue-600 hover:underline" href="@Url.Action("Index", new { category = Model.CurrentCategory, page = Model.Page - 1, specFilters = Model.SelectedFilters })">Previous</a>
+                    }
+                    <span class="text-gray-600 text-sm">Page @Model.Page of @Model.TotalPages</span>
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a class="text-blue-600 hover:underline" href="@Url.Action("Index", new { category = Model.CurrentCategory, page = Model.Page + 1, specFilters = Model.SelectedFilters })">Next</a>
+                    }
+                </div>
+            }
         </div>
     </div>
 }

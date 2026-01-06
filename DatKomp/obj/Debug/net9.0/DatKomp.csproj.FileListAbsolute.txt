@@ -2,7 +2,6 @@ C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\appsettings.Development
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\appsettings.json
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\DatKomp.staticwebassets.runtime.json
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\DatKomp.staticwebassets.endpoints.json
-C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\DatKomp.exe
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\DatKomp.deps.json
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\DatKomp.runtimeconfig.json
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\DatKomp.dll
@@ -22,7 +21,6 @@ C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\scopedcss\Views\Shared\
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\scopedcss\bundle\DatKomp.styles.css
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\scopedcss\projectbundle\DatKomp.bundle.scp.css
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\yqypbdv8op-61n19gt1b8.gz
-C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\z531nklpin-xtxxf3hu2r.gz
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\5l3kh5w06d-bqjiyaj88i.gz
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\9uxtz32842-c2jlpeoesf.gz
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\k7clvuc7dh-erw9l3u2r3.gz
@@ -99,4 +97,5 @@ C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\Npgsql.dll
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\DatKomp.csproj.AssemblyReference.cache
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\DatKomp.csproj.Up2Date
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\DatKomp.sourcelink.json
-C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\lb963xrmqw-5rl9fdq7yk.gz
+C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\lb963xrmqw-yplaw92a5s.gz
+C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\z531nklpin-1qjoxddky3.gz
