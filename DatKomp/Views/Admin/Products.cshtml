@@ -1,0 +1,48 @@
+@model IEnumerable<DatKomp.Models.Product>
+
+@{
+    ViewData["Title"] = "Produktu pārvaldība";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Produktu pārvaldība</h1>
+
+@if (TempData["AdminFlash"] is string msg && !string.IsNullOrWhiteSpace(msg))
+{
+    <div class="mb-3 rounded border border-green-200 bg-green-50 px-3 py-2 text-green-800 text-sm">
+        @msg
+    </div>
+}
+
+<p class="mb-3">
+    <a class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700" asp-action="EditProduct">Pievienot jaunu produktu</a>
+</p>
+
+<table class="table-auto w-full border-collapse">
+    <thead>
+        <tr class="border-b">
+            <th class="text-left py-2 px-2">ID</th>
+            <th class="text-left py-2 px-2">Nosaukums</th>
+            <th class="text-right py-2 px-2">Cena</th>
+            <th class="text-right py-2 px-2">Daudzums</th>
+            <th class="text-left py-2 px-2">Darbības</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr class="border-b">
+            <td class="py-2 px-2">@p.Id</td>
+            <td class="py-2 px-2">@p.Name</td>
+            <td class="py-2 px-2 text-right">@p.Price.ToString("0.00") €</td>
+            <td class="py-2 px-2 text-right">@p.StockQty</td>
+            <td class="py-2 px-2">
+                <a class="text-blue-600 hover:underline mr-2" asp-action="EditProduct" asp-route-id="@p.Id">Rediģēt</a>
+                <form asp-action="DeleteProduct" method="post" class="inline">
+                    <input type="hidden" name="id" value="@p.Id" />
+                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Vai tiešām dzēst šo produktu?');">Dzēst</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

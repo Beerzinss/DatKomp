@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Pasūtījums apstiprināts";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Paldies par pasūtījumu!</h1>
+
+<p>Jūsu pasūtījuma numurs ir <strong>@ViewBag.OrderId</strong>.</p>
+
+<p class="mt-4">
+    <a asp-controller="Home" asp-action="Index" class="text-blue-600 hover:underline">Atgriezties uz sākumlapu</a>
+</p>

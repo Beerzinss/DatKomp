@@ -1,0 +1,43 @@
+@model DatKomp.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Reģistrācija";
+}
+
+<h1 class="mb-4 text-2xl font-bold">Reģistrācija</h1>
+
+<form asp-action="Register" method="post" class="space-y-4 max-w-md">
+    <div>
+        <label asp-for="FirstName" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="FirstName" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="FirstName" class="text-red-600 text-sm"></span>
+    </div>
+    <div>
+        <label asp-for="LastName" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="LastName" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="LastName" class="text-red-600 text-sm"></span>
+    </div>
+    <div>
+        <label asp-for="Email" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="Email" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="Email" class="text-red-600 text-sm"></span>
+    </div>
+    <div>
+        <label asp-for="Password" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="Password" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="Password" class="text-red-600 text-sm"></span>
+    </div>
+    <div>
+        <label asp-for="ConfirmPassword" class="block text-sm font-medium mb-1"></label>
+        <input asp-for="ConfirmPassword" class="w-full border rounded px-3 py-2" />
+        <span asp-validation-for="ConfirmPassword" class="text-red-600 text-sm"></span>
+    </div>
+
+    <button type="submit" class="mt-2 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+        Reģistrēties
+    </button>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

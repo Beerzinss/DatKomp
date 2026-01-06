@@ -1,0 +1,40 @@
+@model DatKomp.Models.DeliveryType
+
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Jauns piegādes veids" : "Rediģēt piegādes veidu";
+}
+
+<h1 class="mb-4 text-2xl font-bold">@ViewData["Title"]</h1>
+
+<form asp-action="EditDeliveryType" method="post" class="space-y-4">
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label asp-for="Name" class="block font-semibold mb-1"></label>
+        <input asp-for="Name" class="w-full border rounded px-2 py-1" />
+        <span asp-validation-for="Name" class="text-red-600 text-sm"></span>
+    </div>
+
+    <div>
+        <label asp-for="Description" class="block font-semibold mb-1"></label>
+        <textarea asp-for="Description" class="w-full border rounded px-2 py-1" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-red-600 text-sm"></span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label asp-for="Price" class="block font-semibold mb-1"></label>
+            <input asp-for="Price" class="w-full border rounded px-2 py-1" />
+            <span asp-validation-for="Price" class="text-red-600 text-sm"></span>
+        </div>
+        <div class="flex items-center gap-2 mt-6">
+            <input asp-for="IsActive" class="" />
+            <label asp-for="IsActive" class="font-semibold"></label>
+        </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">Saglabāt</button>
+        <a asp-action="DeliveryTypes" class="px-4 py-1 rounded border border-gray-300">Atpakaļ</a>
+    </div>
+</form>

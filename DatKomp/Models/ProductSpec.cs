@@ -12,10 +12,10 @@ public class ProductSpec
     public int ProductId { get; set; }
 
     [Column("key")]
-    public string SpecName { get; set; } = string.Empty;
+    public string? SpecName { get; set; }
 
     [Column("value")]
-    public string SpecValue { get; set; } = string.Empty;
+    public string? SpecValue { get; set; }
 
     [Column("unit")]
     public string? Unit { get; set; }
