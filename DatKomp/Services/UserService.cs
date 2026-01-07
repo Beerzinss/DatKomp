@@ -46,6 +46,33 @@ public class UserService
         return null;
     }
 
+    public async Task<AppUser?> GetByIdAsync(int id)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"SELECT id, first_name, last_name, email, password_hash, is_admin FROM app_user WHERE id = @id";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@id", id);
+
+        await using var reader = await cmd.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        {
+            return new AppUser
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                LastName = reader.GetString(reader.GetOrdinal("last_name")),
+                Email = reader.GetString(reader.GetOrdinal("email")),
+                PasswordHash = reader.GetString(reader.GetOrdinal("password_hash")),
+                IsAdmin = !reader.IsDBNull(reader.GetOrdinal("is_admin")) && reader.GetBoolean(reader.GetOrdinal("is_admin"))
+            };
+        }
+
+        return null;
+    }
+
     public async Task<int> CreateUserAsync(string firstName, string lastName, string email, string password)
     {
         var passwordHash = HashPassword(password);
@@ -96,6 +123,46 @@ public class UserService
         }
 
         return users;
+    }
+
+    public async Task<bool> UserHasOrdersAsync(int userId)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"SELECT 1 FROM orders WHERE user_id = @user_id LIMIT 1";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@user_id", userId);
+
+        var result = await cmd.ExecuteScalarAsync();
+        return result != null && result != DBNull.Value;
+    }
+
+    public async Task<bool> DeleteUserAsync(int userId)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        await using var tx = await connection.BeginTransactionAsync();
+
+        const string deleteMessagesSql = @"DELETE FROM contact_message WHERE user_id = @user_id";
+        await using (var deleteMessagesCmd = new NpgsqlCommand(deleteMessagesSql, connection, tx))
+        {
+            deleteMessagesCmd.Parameters.AddWithValue("@user_id", userId);
+            await deleteMessagesCmd.ExecuteNonQueryAsync();
+        }
+
+        const string deleteUserSql = @"DELETE FROM app_user WHERE id = @user_id";
+        int affected;
+        await using (var deleteUserCmd = new NpgsqlCommand(deleteUserSql, connection, tx))
+        {
+            deleteUserCmd.Parameters.AddWithValue("@user_id", userId);
+            affected = await deleteUserCmd.ExecuteNonQueryAsync();
+        }
+
+        await tx.CommitAsync();
+        return affected > 0;
     }
 
     public bool VerifyPassword(string password, string storedHash)

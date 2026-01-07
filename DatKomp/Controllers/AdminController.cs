@@ -2,6 +2,7 @@ using DatKomp.Models;
 using DatKomp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DatKomp.Controllers;
 
@@ -183,6 +184,52 @@ public class AdminController : Controller
     {
         var users = await _userService.GetAllUsersAsync();
         return View(users);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(currentUserIdString, out var currentUserId) && currentUserId == id)
+        {
+            TempData["AdminFlash"] = "Nevar dzēst pašreiz ielogoto admin lietotāju.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        var user = await _userService.GetByIdAsync(id);
+        if (user == null)
+        {
+            TempData["AdminFlash"] = "Lietotājs netika atrasts.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        if (user.IsAdmin)
+        {
+            TempData["AdminFlash"] = "Admin lietotājus dzēst nav atļauts.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        if (await _userService.UserHasOrdersAsync(id))
+        {
+            TempData["AdminFlash"] = "Lietotāju nevar dzēst, jo eksistē ar viņu saistīti pasūtījumi.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        try
+        {
+            var deleted = await _userService.DeleteUserAsync(id);
+            TempData["AdminFlash"] = deleted
+                ? "Lietotājs dzēsts."
+                : "Neizdevās dzēst lietotāju.";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete user (Id={UserId})", id);
+            TempData["AdminFlash"] = "Neizdevās dzēst lietotāju.";
+        }
+
+        return RedirectToAction(nameof(Users));
     }
 
     // Orders

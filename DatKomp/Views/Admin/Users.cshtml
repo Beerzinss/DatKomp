@@ -6,6 +6,13 @@
 
 <h1 class="mb-4 text-2xl font-bold">Reģistrētie lietotāji</h1>
 
+@if (TempData["AdminFlash"] is string msg && !string.IsNullOrWhiteSpace(msg))
+{
+    <div class="mb-3 rounded border border-green-200 bg-green-50 px-3 py-2 text-green-800 text-sm">
+        @msg
+    </div>
+}
+
 <table class="table-auto w-full border-collapse">
     <thead>
         <tr class="border-b">
@@ -14,6 +21,7 @@
             <th class="text-left py-2 px-2">Uzvārds</th>
             <th class="text-left py-2 px-2">E-pasts</th>
             <th class="text-left py-2 px-2">Admin</th>
+            <th class="text-left py-2 px-2">Darbības</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +33,15 @@
             <td class="py-2 px-2">@u.LastName</td>
             <td class="py-2 px-2">@u.Email</td>
             <td class="py-2 px-2">@(u.IsAdmin ? "Jā" : "Nē")</td>
+            <td class="py-2 px-2">
+                @if (!u.IsAdmin)
+                {
+                    <form asp-action="DeleteUser" method="post" class="inline">
+                        <input type="hidden" name="id" value="@u.Id" />
+                        <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Vai tiešām dzēst šo lietotāju?');">Dzēst</button>
+                    </form>
+                }
+            </td>
         </tr>
     }
     </tbody>
