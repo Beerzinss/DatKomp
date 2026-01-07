@@ -1,5 +1,6 @@
 using DatKomp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace DatKomp;
 
@@ -8,6 +9,13 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
@@ -30,6 +38,8 @@ public class Program
         });
 
         var app = builder.Build();
+
+        app.UseForwardedHeaders();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

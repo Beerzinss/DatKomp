@@ -97,5 +97,5 @@ C:\Users\berzi\Desktop\Net_Proj\DatKomp\bin\Debug\net9.0\Npgsql.dll
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\DatKomp.csproj.AssemblyReference.cache
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\DatKomp.csproj.Up2Date
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\DatKomp.sourcelink.json
-C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\lb963xrmqw-yplaw92a5s.gz
 C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\z531nklpin-1qjoxddky3.gz
+C:\Users\berzi\Desktop\Net_Proj\DatKomp\obj\Debug\net9.0\compressed\lb963xrmqw-dy20l89tzk.gz

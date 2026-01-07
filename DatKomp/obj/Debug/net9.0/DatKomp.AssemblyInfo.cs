@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DatKomp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+16c367effba037ca957230690b9633961c75c7a1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+34928ae23f753af4c13f4c595d6f22708d93203c")]
 [assembly: System.Reflection.AssemblyProductAttribute("DatKomp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DatKomp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
