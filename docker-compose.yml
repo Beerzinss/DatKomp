@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     env_file:
       - .env
     environment:
@@ -24,7 +24,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - datkomp_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
@@ -33,4 +33,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  datkomp_postgres_data:
