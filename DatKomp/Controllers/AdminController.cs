@@ -186,6 +186,141 @@ public class AdminController : Controller
         return View(users);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> EditUser(int? id)
+    {
+        if (id == null)
+        {
+            return View(new AdminUserEditViewModel());
+        }
+
+        var user = await _userService.GetByIdAsync(id.Value);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var vm = new AdminUserEditViewModel
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            IsAdmin = user.IsAdmin
+        };
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditUser(AdminUserEditViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var emailTrimmed = (model.Email ?? string.Empty).Trim();
+
+        try
+        {
+            if (model.Id == 0)
+            {
+                if (string.IsNullOrWhiteSpace(model.Password))
+                {
+                    ModelState.AddModelError(nameof(model.Password), "Parole ir obligāta.");
+                    return View(model);
+                }
+
+                if (model.Password != model.ConfirmPassword)
+                {
+                    ModelState.AddModelError(nameof(model.ConfirmPassword), "Paroles nesakrīt.");
+                    return View(model);
+                }
+
+                var existing = await _userService.GetByEmailAsync(emailTrimmed);
+                if (existing != null)
+                {
+                    ModelState.AddModelError(nameof(model.Email), "Lietotājs ar šo e-pastu jau eksistē.");
+                    return View(model);
+                }
+
+                var newId = await _userService.CreateUserAsync(
+                    model.FirstName,
+                    model.LastName,
+                    emailTrimmed,
+                    model.Password,
+                    model.IsAdmin);
+
+                TempData["AdminFlash"] = $"Lietotājs pievienots (ID: {newId}).";
+                return RedirectToAction(nameof(Users));
+            }
+
+            var current = await _userService.GetByIdAsync(model.Id);
+            if (current == null)
+            {
+                TempData["AdminFlash"] = "Lietotājs netika atrasts.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(currentUserIdString, out var currentUserId) && currentUserId == model.Id && !model.IsAdmin)
+            {
+                ModelState.AddModelError(nameof(model.IsAdmin), "Nevar noņemt admin tiesības pašreiz ielogotajam lietotājam.");
+                return View(model);
+            }
+
+            var existingByEmail = await _userService.GetByEmailAsync(emailTrimmed);
+            if (existingByEmail != null && existingByEmail.Id != model.Id)
+            {
+                ModelState.AddModelError(nameof(model.Email), "Lietotājs ar šo e-pastu jau eksistē.");
+                return View(model);
+            }
+
+            var updatePayload = new AppUser
+            {
+                Id = model.Id,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = emailTrimmed,
+                IsAdmin = model.IsAdmin
+            };
+
+            var updated = await _userService.UpdateUserAsync(updatePayload);
+            if (!updated)
+            {
+                TempData["AdminFlash"] = "Neizdevās saglabāt lietotāju.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.Password))
+            {
+                if (model.Password != model.ConfirmPassword)
+                {
+                    ModelState.AddModelError(nameof(model.ConfirmPassword), "Paroles nesakrīt.");
+                    return View(model);
+                }
+
+                var pwdUpdated = await _userService.UpdatePasswordAsync(model.Id, model.Password);
+                if (!pwdUpdated)
+                {
+                    TempData["AdminFlash"] = "Lietotājs saglabāts, bet paroli neizdevās atjaunināt.";
+                    return RedirectToAction(nameof(Users));
+                }
+            }
+
+            TempData["AdminFlash"] = "Lietotājs saglabāts.";
+            return RedirectToAction(nameof(Users));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save user (Id={UserId})", model.Id);
+            ModelState.AddModelError(string.Empty, "Neizdevās saglabāt lietotāju.");
+            return View(model);
+        }
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteUser(int id)
@@ -206,8 +341,12 @@ public class AdminController : Controller
 
         if (user.IsAdmin)
         {
-            TempData["AdminFlash"] = "Admin lietotājus dzēst nav atļauts.";
-            return RedirectToAction(nameof(Users));
+            var adminCount = await _userService.CountAdminsAsync();
+            if (adminCount <= 1)
+            {
+                TempData["AdminFlash"] = "Nevar dzēst pēdējo admin lietotāju.";
+                return RedirectToAction(nameof(Users));
+            }
         }
 
         if (await _userService.UserHasOrdersAsync(id))
@@ -308,6 +447,32 @@ public class AdminController : Controller
         else
         {
             await _orderService.UpdateDeliveryTypeAsync(model);
+        }
+
+        return RedirectToAction(nameof(DeliveryTypes));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteDeliveryType(int id)
+    {
+        if (await _orderService.DeliveryTypeHasOrdersAsync(id))
+        {
+            TempData["AdminFlash"] = "Piegādes veidu nevar dzēst, jo tas ir izmantots pasūtījumos.";
+            return RedirectToAction(nameof(DeliveryTypes));
+        }
+
+        try
+        {
+            var deleted = await _orderService.DeleteDeliveryTypeAsync(id);
+            TempData["AdminFlash"] = deleted
+                ? "Piegādes veids dzēsts."
+                : "Neizdevās dzēst piegādes veidu.";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete delivery type (Id={DeliveryTypeId})", id);
+            TempData["AdminFlash"] = "Neizdevās dzēst piegādes veidu.";
         }
 
         return RedirectToAction(nameof(DeliveryTypes));

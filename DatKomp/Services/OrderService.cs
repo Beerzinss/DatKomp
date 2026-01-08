@@ -345,6 +345,34 @@ public class OrderService
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task<bool> DeliveryTypeHasOrdersAsync(int deliveryTypeId)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"SELECT 1 FROM orders WHERE delivery_type_id = @delivery_type_id LIMIT 1";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@delivery_type_id", deliveryTypeId);
+
+        var result = await cmd.ExecuteScalarAsync();
+        return result != null && result != DBNull.Value;
+    }
+
+    public async Task<bool> DeleteDeliveryTypeAsync(int deliveryTypeId)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"DELETE FROM delivery_type WHERE id = @id";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@id", deliveryTypeId);
+
+        var affected = await cmd.ExecuteNonQueryAsync();
+        return affected > 0;
+    }
+
     public async Task<int> CreateOrderAsync(CheckoutViewModel model, List<CartItem> cartItems, int userId, int defaultOrderStatusId)
     {
         if (cartItems.Count == 0)

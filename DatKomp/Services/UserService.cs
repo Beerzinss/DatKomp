@@ -75,6 +75,11 @@ public class UserService
 
     public async Task<int> CreateUserAsync(string firstName, string lastName, string email, string password)
     {
+        return await CreateUserAsync(firstName, lastName, email, password, isAdmin: false);
+    }
+
+    public async Task<int> CreateUserAsync(string firstName, string lastName, string email, string password, bool isAdmin)
+    {
         var passwordHash = HashPassword(password);
 
         await using var connection = new NpgsqlConnection(_connectionString);
@@ -89,7 +94,7 @@ public class UserService
         cmd.Parameters.AddWithValue("@last_name", lastName);
         cmd.Parameters.AddWithValue("@email", email);
         cmd.Parameters.AddWithValue("@password_hash", passwordHash);
-        cmd.Parameters.AddWithValue("@is_admin", false);
+        cmd.Parameters.AddWithValue("@is_admin", isAdmin);
 
         var id = await cmd.ExecuteScalarAsync();
         return Convert.ToInt32(id);
@@ -123,6 +128,18 @@ public class UserService
         }
 
         return users;
+    }
+
+    public async Task<int> CountAdminsAsync()
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"SELECT COUNT(*) FROM app_user WHERE is_admin = true";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        var result = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt32(result);
     }
 
     public async Task<bool> UserHasOrdersAsync(int userId)
@@ -162,6 +179,48 @@ public class UserService
         }
 
         await tx.CommitAsync();
+        return affected > 0;
+    }
+
+    public async Task<bool> UpdateUserAsync(AppUser user)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"UPDATE app_user
+                             SET first_name = @first_name,
+                                 last_name = @last_name,
+                                 email = @email,
+                                 is_admin = @is_admin
+                             WHERE id = @id";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@id", user.Id);
+        cmd.Parameters.AddWithValue("@first_name", user.FirstName);
+        cmd.Parameters.AddWithValue("@last_name", user.LastName);
+        cmd.Parameters.AddWithValue("@email", user.Email);
+        cmd.Parameters.AddWithValue("@is_admin", user.IsAdmin);
+
+        var affected = await cmd.ExecuteNonQueryAsync();
+        return affected > 0;
+    }
+
+    public async Task<bool> UpdatePasswordAsync(int userId, string newPassword)
+    {
+        var passwordHash = HashPassword(newPassword);
+
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        const string sql = @"UPDATE app_user
+                             SET password_hash = @password_hash
+                             WHERE id = @id";
+
+        await using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@id", userId);
+        cmd.Parameters.AddWithValue("@password_hash", passwordHash);
+
+        var affected = await cmd.ExecuteNonQueryAsync();
         return affected > 0;
     }
 
