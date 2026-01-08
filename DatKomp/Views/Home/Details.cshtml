@@ -7,7 +7,7 @@
     <div class="pb-5 font-semibold">
         <a asp-action="Index" class="btn btn-secondary">Atpakal uz produktu sarakstu</a>
     </div>
-    <div class="card flex gap-24">
+    <div class="card flex flex-col md:flex-row gap-24">
         @if (!string.IsNullOrEmpty(Model.Product.ImageUrl))
         {
             <img src="@Model.Product.ImageUrl" class="card-img-top mb-4 max-w-md" alt="@Model.Product.Name" />
