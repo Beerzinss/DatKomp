@@ -19,16 +19,27 @@ public class HomeController : Controller
         _messageService = messageService;
     }
 
-    public async Task<IActionResult> Index(string? category, List<string>? specFilters, int page = 1)
+    public async Task<IActionResult> Index(string? category, List<string>? specFilters, string? q, int page = 1)
     {
         const int pageSize = 12;
         if (page < 1) page = 1;
+
+        var qTrimmed = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
 
         List<Product> products;
 
         if (string.IsNullOrWhiteSpace(category))
         {
             products = await _productService.GetAllProductsAsync();
+
+            if (!string.IsNullOrWhiteSpace(qTrimmed))
+            {
+                products = products
+                    .Where(p =>
+                        (!string.IsNullOrWhiteSpace(p.Name) && p.Name.Contains(qTrimmed, StringComparison.OrdinalIgnoreCase))
+                        || (!string.IsNullOrWhiteSpace(p.Description) && p.Description.Contains(qTrimmed, StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+            }
 
             var totalItems = products.Count;
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -43,6 +54,7 @@ public class HomeController : Controller
             {
                 Products = pagedProducts,
                 CurrentCategory = null,
+                SearchQuery = qTrimmed,
                 Page = page,
                 PageSize = pageSize,
                 TotalItems = totalItems
@@ -86,6 +98,15 @@ public class HomeController : Controller
                 .ToList();
         }
 
+        if (!string.IsNullOrWhiteSpace(qTrimmed))
+        {
+            products = products
+                .Where(p =>
+                    (!string.IsNullOrWhiteSpace(p.Name) && p.Name.Contains(qTrimmed, StringComparison.OrdinalIgnoreCase))
+                    || (!string.IsNullOrWhiteSpace(p.Description) && p.Description.Contains(qTrimmed, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+        }
+
         var totalItemsFiltered = products.Count;
         var totalPagesFiltered = (int)Math.Ceiling(totalItemsFiltered / (double)pageSize);
         if (totalPagesFiltered > 0 && page > totalPagesFiltered) page = totalPagesFiltered;
@@ -124,6 +145,7 @@ public class HomeController : Controller
         {
             Products = products,
             CurrentCategory = category,
+            SearchQuery = qTrimmed,
             SpecFilters = groups,
             SelectedFilters = selectedFilters,
             Page = page,
